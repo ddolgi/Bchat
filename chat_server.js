@@ -18,12 +18,29 @@ var server = http.createServer(function (req, res) {
 	console.log('Chatting Server Running at '+ port);
 });
 
+var users = {};
 var io = socketio.listen(server);
 io.set('log level', 2);
 io.sockets.on('connection', function(socket) {
-	socket.on('message', function(data) {
-		io.sockets.emit('message', data);
+	socket.on('set name', function (name) {
+		socket.set('name', name, function () {
+		   	socket.emit('ready');
+			users[name] = new Date().toUTCString(); 
+			io.sockets.emit('users', users);
+	   	});
 	});
 
+	socket.on('message', function(msg) {
+		io.sockets.emit('message', msg);
+	});
+
+	socket.on('disconnect', function(data) {
+		socket.get('name', function (err, name) {
+			delete users[name];
+			io.sockets.emit('users', users);
+		});
+	});
 });
+
+
 

@@ -5,60 +5,83 @@
 	<link rel = "stylesheet" href = "http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 	<script src = "http://code.jquery.com/jquery-1.7.1.js"></script>
 	<script src = "http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+	<script src = "https://jsxt.googlecode.com/svn/trunk/js/String.js"></script>
 
 	<script src = "/socket.io/socket.io.js"></script>
 	<script>
 		$(document).ready(function(){
 			var socket = io.connect();
+			var name = '';
+
+			// Initiate
+			socket.on('connect', function () {
+				while( name == '' )
+				{
+					name = prompt('What is your Name?');
+					if ( name == null ) 
+						name = '';
+				   	else 
+						name = name.trim();
+				}
+
+				socket.emit('set name', name);
+				socket.on('ready', function (users) {
+			//		$('#users').text(JSON.stringify(users));
+			//		console.log('Connected !');
+				});
+			});
+
+			// Update
+			socket.on('users', function (users) {
+				var members = "Members: ";
+				for (key in users)
+					members += key + ", "
+					
+				$('#users').text(members);
+			});
+
+			// Recieve
 			socket.on('message', function(data) {
-				var output = '';
-				output += '<li>';
-				output += '	<h3>' + data.name + '</h3>';
-				output += '	<p>' + data.message + '</p>';
-				output += '	<p>' + data.date + '</p>';
+				//var output = '<li><p class="ui-li-aside ul-li-desc">' +data.date +'</p><h2>' +data.name +'</h2><pre>' +data.message;
+				var output = '<li>';
+				output += '<p class="ui-li-aside ul-li-desc">' +data.date +'</p>';
+				output += '<pre>' +data.name;
+			   	output += ': ' +data.message;
+			   	output += '</pre>';
 				output += '</li>';
 
 				$(output).prependTo('#content');
 				$('#content').listview('refresh');
 			});
 
-			var send = function(){
+			// Send
+			function send (){
 				var msg = $('#message').val();
-				if( msg.trim() != "" )
-					socket.emit('message', {
-						name: $('#name').val(),
-						message: msg,
-						date: new Date().toUTCString()
-					});
 				$('#message').val("");
-			}
+				if( msg.trim() == "" ) return;
 
+				var now = new Date();
+				socket.emit('message', {
+					name: name,
+					message: msg,
+					date: '%02d:%02d:%02d'.sprintf( now.getHours(), now.getMinutes(), now.getSeconds())
+				});
+			}
 			$('button').click(send);
       		$(document).keypress(function(e) { if (e.keyCode == 13) send(); });
 		});
 	</script>
 </head>
 <body>
-	<div data-role = "page">
-		<div data-role = "header">
-			<h1>Socket.io Chat</h1>
-		</div>
-		<div data-role = "content">
-			<h3>Input your Name:</h3>
-			<input id = "name" />
-			<a data-role="button" href = "#chatpage">Start Chat</a>
-		</div>
-	</div>
 	<div data-role = "page" id="chatpage">
 		<div data-role="header">
-			<h1>Socket.io Chat</h1>
+			<h1>Web Chat</h1>
 		</div>
 		<div data-role = "content">
+			<p id = "users" > </p>
 			<input id = "message" />
 			<button>Send</button>
-			<ul id = "content" data-role="listview" data-insert = "true">
-
-			</ul>
+			<ul id = "content" data-role="listview" data-inset = "true"> </ul>
 		</div>
 	</div>
 </body>
