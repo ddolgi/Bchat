@@ -1,0 +1,66 @@
+<html>
+<head>
+	<title> Web Chat </title>
+	<meta name = "viewport" content = "width = device-width, initial-scale =1"/>
+	<link rel = "stylesheet" href = "http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+	<script src = "http://code.jquery.com/jquery-1.7.1.js"></script>
+	<script src = "http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+
+	<script src = "/socket.io/socket.io.js"></script>
+	<script>
+		$(document).ready(function(){
+			var socket = io.connect();
+			socket.on('message', function(data) {
+				var output = '';
+				output += '<li>';
+				output += '	<h3>' + data.name + '</h3>';
+				output += '	<p>' + data.message + '</p>';
+				output += '	<p>' + data.date + '</p>';
+				output += '</li>';
+
+				$(output).prependTo('#content');
+				$('#content').listview('refresh');
+			});
+
+			var send = function(){
+				var msg = $('#message').val();
+				if( msg.trim() != "" )
+					socket.emit('message', {
+						name: $('#name').val(),
+						message: msg,
+						date: new Date().toUTCString()
+					});
+				$('#message').val("");
+			}
+
+			$('button').click(send);
+      		$(document).keypress(function(e) { if (e.keyCode == 13) send(); });
+		});
+	</script>
+</head>
+<body>
+	<div data-role = "page">
+		<div data-role = "header">
+			<h1>Socket.io Chat</h1>
+		</div>
+		<div data-role = "content">
+			<h3>Input your Name:</h3>
+			<input id = "name" />
+			<a data-role="button" href = "#chatpage">Start Chat</a>
+		</div>
+	</div>
+	<div data-role = "page" id="chatpage">
+		<div data-role="header">
+			<h1>Socket.io Chat</h1>
+		</div>
+		<div data-role = "content">
+			<input id = "message" />
+			<button>Send</button>
+			<ul id = "content" data-role="listview" data-insert = "true">
+
+			</ul>
+		</div>
+	</div>
+</body>
+</html>
+
