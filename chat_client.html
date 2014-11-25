@@ -1,14 +1,31 @@
 <html>
 <head>
-	<title> Web Chat </title>
+	<title>Simple Web Chat</title>
 	<meta name = "viewport" content = "width = device-width, initial-scale =1"/>
 	<link rel = "stylesheet" href = "http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 	<script src = "http://code.jquery.com/jquery-1.7.1.js"></script>
 	<script src = "http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
 	<script src = "https://jsxt.googlecode.com/svn/trunk/js/String.js"></script>
 
-	<script src = "/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script>
+		function EvalSound(soundobj){
+			var thissound= eval("document."+soundobj);
+			thissound.Play();
+		}
+	
+		var title = "Simple Web Chat";
+		var countUnread = -1;
+
+		window.onfocus=function(){
+			countUnread = -1;
+			document.title=title;
+		}
+
+		window.onblur=function(){
+			countUnread = 0;
+		}
+
 		$(document).ready(function(){
 			var socket = io.connect();
 			var name = '';
@@ -50,6 +67,13 @@
 			   	output += '</pre>';
 				output += '</li>';
 
+				EvalSound('sound1');
+				if( countUnread != -1 )
+				{
+					countUnread += 1;
+					document.title = "("+countUnread+") " + title;
+				}
+
 				$(output).prependTo('#content');
 				$('#content').listview('refresh');
 			});
@@ -72,10 +96,11 @@
 		});
 	</script>
 </head>
+<embed src="http://tmc.daumsoft.com/chat/recv_chat.wav" autostart=false hidden=true name="sound1" width=100 height=100 enablejavascript=true>
 <body>
 	<div data-role = "page" id="chatpage">
 		<div data-role="header">
-			<h1>Web Chat</h1>
+			<h1>Simple Web Chat</h1>
 		</div>
 		<div data-role = "content">
 			<p id = "users" > </p>

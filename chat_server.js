@@ -2,13 +2,14 @@ var http = require('http');
 var fs = require('fs');
 var socketio = require('socket.io');
 
-if (process.argv.length < 3 )
-{
-	console.log("Usage : node %s PORT", process.argv[1]);
-	process.exit();
-}
+//if (process.argv.length < 3 )
+//{
+	//console.log("Usage : node %s PORT", process.argv[1]);
+	//process.exit();
+//}
 
-var port = process.argv[2];
+//var port = process.argv[2];
+var port = 50000;
 var server = http.createServer(function (req, res) {
 	fs.readFile('chat_client.html', function(err, data) {
 		res.writeHead(200, {'Content-Type': 'text/html' });
