@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
 	<title>Simple Web Chat</title>
@@ -5,21 +6,19 @@
 	<link rel = "stylesheet" href = "http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 	<script src = "http://code.jquery.com/jquery-1.7.1.js"></script>
 	<script src = "http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
-	<script src = "https://jsxt.googlecode.com/svn/trunk/js/String.js"></script>
 
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="https://momentjs.com/downloads/moment.js"></script>
+	<script type="text/javascript" src="https://momentjs.com/downloads/moment-timezone-with-data.js"></script>
 	<script>
-		function EvalSound(soundobj){
-			var thissound= eval("document."+soundobj);
-			thissound.Play();
-		}
+		var recv_sound = new Audio("http://localhost:8080/jhbyun/Bchat/recv_chat.wav");
 	
 		var title = "Simple Web Chat";
 		var countUnread = -1;
 
 		window.onfocus=function(){
 			countUnread = -1;
-			document.title=title;
+			document.title = title;
 		}
 
 		window.onblur=function(){
@@ -50,11 +49,8 @@
 
 			// Update
 			socket.on('users', function (users) {
-				var members = "Members: ";
-				for (key in users)
-					members += key + ", "
-					
-				$('#users').text(members);
+				var members = Object.keys(users);
+				$('#users').text("Members: " + members.join(', '));
 			});
 
 			// Recieve
@@ -67,7 +63,7 @@
 			   	output += '</pre>';
 				output += '</li>';
 
-				EvalSound('sound1');
+				recv_sound.play();
 				if( countUnread != -1 )
 				{
 					countUnread += 1;
@@ -84,11 +80,11 @@
 				$('#message').val("");
 				if( msg.trim() == "" ) return;
 
-				var now = new Date();
+				var now = new moment();
 				socket.emit('message', {
 					name: name,
 					message: msg,
-					date: '%02d:%02d:%02d'.sprintf( now.getHours(), now.getMinutes(), now.getSeconds())
+					date: now.tz('Asia/Seoul').format('HH:mm:ss')
 				});
 			}
 			$('button').click(send);
@@ -96,7 +92,6 @@
 		});
 	</script>
 </head>
-<embed src="http://tmc.daumsoft.com/chat/recv_chat.wav" autostart=false hidden=true name="sound1" width=100 height=100 enablejavascript=true>
 <body>
 	<div data-role = "page" id="chatpage">
 		<div data-role="header">
@@ -104,8 +99,7 @@
 		</div>
 		<div data-role = "content">
 			<p id = "users" > </p>
-			<input id = "message" />
-			<button>Send</button>
+			<input id = "message" /><button>Send</button>
 			<ul id = "content" data-role="listview" data-inset = "true"> </ul>
 		</div>
 	</div>
