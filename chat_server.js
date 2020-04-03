@@ -21,12 +21,12 @@ var server = http.createServer(function (req, res) {
 
 var users = {};
 var io = socketio.listen(server);
-var myName = "";
 io.set('log level', 2);
 io.sockets.on('connection', function(socket) {
+	var myName = "";
 	socket.on('set name', function (name) {
-	   	socket.emit('ready');
-	   	myName = name;
+		socket.emit('ready');
+		myName = name;
 		users[name] = new Date().toUTCString(); 
 		io.sockets.emit('users', users);
 	});

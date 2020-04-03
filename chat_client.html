@@ -11,17 +11,17 @@
 	<script type="text/javascript" src="https://momentjs.com/downloads/moment.js"></script>
 	<script type="text/javascript" src="https://momentjs.com/downloads/moment-timezone-with-data.js"></script>
 	<script>
-		var recv_sound = new Audio("http://localhost:8080/jhbyun/Bchat/recv_chat.wav");
+		var recv_sound = new Audio("http://ddolgi.pe.kr/Bchat/recv_chat.wav");
 	
 		var title = "Simple Web Chat";
 		var countUnread = -1;
 
-		window.onfocus=function(){
+		window.onfocus = function(){
 			countUnread = -1;
 			document.title = title;
 		}
 
-		window.onblur=function(){
+		window.onblur = function(){
 			countUnread = 0;
 		}
 
@@ -41,10 +41,10 @@
 				}
 
 				socket.emit('set name', name);
-				socket.on('ready', function (users) {
+				// socket.on('ready', function (users) {
 			//		$('#users').text(JSON.stringify(users));
 			//		console.log('Connected !');
-				});
+				// });
 			});
 
 			// Update
@@ -56,18 +56,15 @@
 			// Recieve
 			socket.on('message', function(data) {
 				//var output = '<li><p class="ui-li-aside ul-li-desc">' +data.date +'</p><h2>' +data.name +'</h2><pre>' +data.message;
-				var output = '<li>';
-				output += '<p class="ui-li-aside ul-li-desc">' +data.date +'</p>';
-				output += '<pre>' +data.name;
-			   	output += ': ' +data.message;
-			   	output += '</pre>';
-				output += '</li>';
+				var output = '<li><p class="ui-li-aside ul-li-desc">';
+				output += data.date + '</p><pre>';
+				output += data.name + ': ' + data.message + '</pre></li>';
 
 				recv_sound.play();
 				if( countUnread != -1 )
 				{
 					countUnread += 1;
-					document.title = "("+countUnread+") " + title;
+					document.title = title + "(" + countUnread + ")";
 				}
 
 				$(output).prependTo('#content');
@@ -75,7 +72,7 @@
 			});
 
 			// Send
-			function send (){
+			function send(){
 				var msg = $('#message').val();
 				$('#message').val("");
 				if( msg.trim() == "" ) return;
@@ -95,11 +92,14 @@
 <body>
 	<div data-role = "page" id="chatpage">
 		<div data-role="header">
-			<h1>Simple Web Chat</h1>
+			<h2>Simple Web Chat</h2>
 		</div>
 		<div data-role = "content">
 			<p id = "users" > </p>
-			<input id = "message" /><button>Send</button>
+			<table width="100%"><tr>
+				<td><input id = "message" /></td>
+				<td width="50"><button>Send</button></td>
+			</tr></table>
 			<ul id = "content" data-role="listview" data-inset = "true"> </ul>
 		</div>
 	</div>
